@@ -1,2 +1,105 @@
 <!DOCTYPE html>
-<html><head><title>Solar ROI Calculator</title></head><body></body></html>
+<html>
+<head>
+  <title>Solar ROI Calculator</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background: #f9f9f9;
+    }
+    h1 {
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 30px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Solar Farm Battery ROI Calculator</h1>
+
+  <label>Battery Bank Capacity (kWh)</label>
+  <input type="number" id="capacity" value="600">
+
+  <label>Cost of New Batteries (₹/kWh)</label>
+  <input type="number" id="costNew" value="10000">
+
+  <label>Cost of Regenerated Batteries (₹/kWh)</label>
+  <input type="number" id="costRegen" value="6000">
+
+  <label>Battery Replacement Cycle (Years)</label>
+  <input type="number" id="cycleNew" value="3">
+
+  <label>Lifespan of Regenerated Batteries (Years)</label>
+  <input type="number" id="lifeRegen" value="5">
+
+  <label>Battery O&M Cost per Year (₹)</label>
+  <input type="number" id="omCost" value="50000">
+
+  <label>Downtime Cost per Year (₹)</label>
+  <input type="number" id="downtimeCost" value="100000">
+
+  <label>Plant Life (Years)</label>
+  <input type="number" id="plantLife" value="25">
+
+  <button onclick="calculateROI()">Calculate ROI</button>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    function calculateROI() {
+      const cap = +document.getElementById('capacity').value;
+      const costNew = +document.getElementById('costNew').value;
+      const costRegen = +document.getElementById('costRegen').value;
+      const cycleNew = +document.getElementById('cycleNew').value;
+      const lifeRegen = +document.getElementById('lifeRegen').value;
+      const omCost = +document.getElementById('omCost').value;
+      const downtime = +document.getElementById('downtimeCost').value;
+      const plantLife = +document.getElementById('plantLife').value;
+
+      const replacementsNew = Math.ceil(plantLife / cycleNew);
+      const replacementsRegen = Math.ceil(plantLife / lifeRegen);
+
+      const totalCostNew = (cap * costNew * replacementsNew) + (omCost + downtime) * plantLife;
+      const totalCostRegen = (cap * costRegen * replacementsRegen) + (omCost + downtime) * plantLife;
+
+      const savings = totalCostNew - totalCostRegen;
+      const savingsPercent = (savings / totalCostNew * 100).toFixed(2);
+
+      document.getElementById('result').innerHTML = `
+        <h2>ROI Results</h2>
+        <p><strong>Total Battery Cost (Traditional):</strong> ₹${totalCostNew.toLocaleString()}</p>
+        <p><strong>Total Battery Cost (Regenerated):</strong> ₹${totalCostRegen.toLocaleString()}</p>
+        <p><strong>Total Savings:</strong> ₹${savings.toLocaleString()} (${savingsPercent}%)</p>
+        <p><strong>Breakeven Estimate:</strong> Within first ${Math.ceil(savings / (cap * costRegen))} years</p>
+        <p><strong>Environmental Impact:</strong> CO₂ emissions and waste reduced significantly through second-life battery use</p>
+      `;
+    }
+  </script>
+</body>
+</html>
